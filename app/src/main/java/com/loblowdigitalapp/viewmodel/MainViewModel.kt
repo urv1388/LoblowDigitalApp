@@ -9,10 +9,12 @@ import com.loblowdigitalapp.model.CartResponse
 import com.loblowdigitalapp.repo.AppRepository
 import com.loblowdigitalapp.utility.Resource
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 
 class MainViewModel(app: Application, private val appRepository: AppRepository) :
     AndroidViewModel(app) {
     fun getCart() = liveData(Dispatchers.IO) {
+        delay(1000)
         emit(Resource.Loading())
         try {
             emit(Resource.Success(data = appRepository.getCart()))
@@ -20,6 +22,4 @@ class MainViewModel(app: Application, private val appRepository: AppRepository) 
             emit(Resource.Error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
-
 }

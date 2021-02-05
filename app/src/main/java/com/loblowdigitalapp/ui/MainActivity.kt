@@ -2,8 +2,9 @@ package com.loblowdigitalapp.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -12,6 +13,7 @@ import com.loblowdigitalapp.R
 import com.loblowdigitalapp.adapter.MyItemRecyclerViewAdapter
 import com.loblowdigitalapp.model.CartItem
 import com.loblowdigitalapp.repo.AppRepository
+import com.loblowdigitalapp.utility.NetworkUtil
 import com.loblowdigitalapp.utility.Resource
 import com.loblowdigitalapp.viewmodel.MainViewModel
 import com.loblowdigitalapp.viewmodel.ViewModelProviderFactory
@@ -21,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val TAG = "MainActivity"
     private lateinit var adapter: MyItemRecyclerViewAdapter
     lateinit var mainViewModel: MainViewModel
+    val handler = Handler(Looper.getMainLooper())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,25 +37,37 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
         }
         recyclerView.adapter = adapter
-        mainViewModel.getCart().observe(this, Observer { response ->
-            when (response) {
-                is Resource.Success -> {
-                    hideProgressBar()
-                    response.data?.let { cartResponse ->
-                        cartResponse.cartResult?.let { adapter.addCartList(it) }
+        getMyCart(null)
+        buttonTryAgain.setOnClickListener {
+            getMyCart(null)
+        }
+    }
+
+    private fun getMyCart(view: View?) {
+        hasError()
+        if (NetworkUtil.hasDataNetwork(this)) {
+            mainViewModel.getCart().observe(this, Observer { response ->
+                when (response) {
+                    is Resource.Success -> {
+                        hideProgressBar()
+                        response.data?.let { cartResponse ->
+                            cartResponse.cartResult?.let { adapter.addCartList(it) }
+                        }
+                    }
+                    is Resource.Error -> {
+                        hideProgressBar()
+                        response.message?.let { message ->
+                            hasError(true, "Error : $message")
+                        }
+                    }
+                    is Resource.Loading -> {
+                        showProgressBar()
                     }
                 }
-                is Resource.Error -> {
-                    hideProgressBar()
-                    response.message?.let { message ->
-                        Toast.makeText(this, "Error : $message", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                is Resource.Loading -> {
-                    showProgressBar()
-                }
-            }
-        })
+            })
+        } else {
+            hasError(true, "It seems no internet connection!")
+        }
     }
 
     private fun hideProgressBar() {
@@ -61,5 +76,19 @@ class MainActivity : AppCompatActivity() {
 
     private fun showProgressBar() {
         progress.visibility = View.VISIBLE
+    }
+
+    private fun hasError(isError: Boolean = false, errorMessage: String = "") {
+        handler.post {
+            if (isError) {
+                textViewError.visibility = View.VISIBLE
+                buttonTryAgain.visibility = View.VISIBLE
+                textViewError.text = errorMessage
+            } else {
+                textViewError.visibility = View.GONE
+                buttonTryAgain.visibility = View.GONE
+            }
+        }
+
     }
 }
