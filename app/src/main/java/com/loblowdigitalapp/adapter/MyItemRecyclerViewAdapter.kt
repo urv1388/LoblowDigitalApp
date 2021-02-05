@@ -1,5 +1,6 @@
 package com.loblowdigitalapp.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +16,7 @@ class MyItemRecyclerViewAdapter(
     private val arrayListCartItem: ArrayList<CartItem>, val adapterOnClick: (Any) -> Unit
 ) : RecyclerView.Adapter<MyItemRecyclerViewAdapter.ViewHolder>() {
 
+    private val TAG = "MyItemRecyclerViewAdapt"
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.fragment_item, parent, false)
@@ -42,4 +44,22 @@ class MyItemRecyclerViewAdapter(
             return super.toString() + " '" + item_name + "'"
         }
     }
+
+    fun addCartList(cartList: ArrayList<CartItem>) {
+        Log.d(TAG, "addCartList: $cartList")
+        this.arrayListCartItem.apply {
+            clear()
+            addAll(cartList)
+            notifyDataSetChanged()
+        }
+    }
+
+    private fun sortElement() {
+        this.arrayListCartItem.apply {
+            sortByDescending { it.name }
+            notifyDataSetChanged()
+        }
+    }
+
+
 }
