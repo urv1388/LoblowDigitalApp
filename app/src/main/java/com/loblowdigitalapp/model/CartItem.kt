@@ -3,7 +3,6 @@ package com.loblowdigitalapp.model
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 data class CartItem(
     val code: String?,

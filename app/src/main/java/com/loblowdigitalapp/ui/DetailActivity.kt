@@ -1,22 +1,25 @@
 package com.loblowdigitalapp.ui
 
 import android.os.Bundle
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.loblowdigitalapp.R
+import com.loblowdigitalapp.model.CartItem
+import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.content_scrolling.*
 
 class DetailActivity : AppCompatActivity() {
+
+    var cartItem: CartItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        setSupportActionBar(findViewById(R.id.toolbar))
-        findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = title
-        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
+        cartItem = intent.getParcelableExtra("cartItem") as CartItem?
+        setTitle(cartItem?.name)
+        textViewPrice.text = "Product price is:  ${cartItem?.price}"
+        textViewType.text = "Product Type is ${cartItem?.type}"
+        Glide.with(this).load(cartItem?.image).into(item_detail_image)
     }
 }

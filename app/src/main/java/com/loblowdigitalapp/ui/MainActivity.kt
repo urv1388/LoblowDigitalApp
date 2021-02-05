@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
         mainViewModel = ViewModelProvider(this, factory).get(MainViewModel::class.java)
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapter = MyItemRecyclerViewAdapter(arrayListOf()) { cartItem ->
-            Intent(this@MainActivity, MainActivity::class.java).apply {
-                intent.putExtra("cartItem", cartItem as CartItem)
-            }.also { startActivity(it) }
+            val intent = Intent(this@MainActivity, DetailActivity::class.java)
+            intent.putExtra("cartItem", cartItem as CartItem)
+            startActivity(intent)
         }
         recyclerView.adapter = adapter
         mainViewModel.getCart().observe(this, Observer { response ->
